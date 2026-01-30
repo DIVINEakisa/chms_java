@@ -1,0 +1,14 @@
+# MySQL Database Configuration
+# Copy this file to database.properties and update the values
+
+db.url=jdbc:mysql://localhost:3306/chms_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+db.username=root
+db.password=your_password_here
+db.driver=com.mysql.cj.jdbc.Driver
+
+# Connection Pool Settings
+db.initialSize=5
+db.maxTotal=10
+db.maxIdle=5
+db.minIdle=2
+db.maxWaitMillis=10000
