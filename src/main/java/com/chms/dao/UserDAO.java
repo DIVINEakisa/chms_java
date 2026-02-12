@@ -327,6 +327,64 @@ public class UserDAO {
     }
     
     /**
+     * Search users by registration date (created_at)
+     * @param registrationDate Date to search for
+     * @return List of users registered on that date
+     */
+    public List<User> searchUsersByRegistrationDate(java.sql.Date registrationDate) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE DATE(created_at) = ? ORDER BY created_at DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, registrationDate);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+            
+            logger.info("Found {} users registered on: {}", users.size(), registrationDate);
+            
+        } catch (SQLException e) {
+            logger.error("Error searching users by registration date: " + registrationDate, e);
+        }
+        
+        return users;
+    }
+    
+    /**
+     * Search users by registration date range
+     * @param startDate Start date of range
+     * @param endDate End date of range
+     * @return List of users registered within the date range
+     */
+    public List<User> searchUsersByDateRange(java.sql.Date startDate, java.sql.Date endDate) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+            
+            logger.info("Found {} users registered between {} and {}", users.size(), startDate, endDate);
+            
+        } catch (SQLException e) {
+            logger.error("Error searching users by date range", e);
+        }
+        
+        return users;
+    }
+    
+    /**
      * Extract User object from ResultSet
      * @param rs ResultSet
      * @return User object

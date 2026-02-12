@@ -126,6 +126,22 @@
                     <path>/chms</path>
                 </configuration>
             </plugin>
+            
+            <!-- Jetty Maven Plugin (Jakarta EE Compatible) -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>11.0.15</version>
+                <configuration>
+                    <httpConnector>
+                        <port>8080</port>
+                    </httpConnector>
+                    <webApp>
+                        <contextPath>/chms</contextPath>
+                    </webApp>
+                    <scan>0</scan>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

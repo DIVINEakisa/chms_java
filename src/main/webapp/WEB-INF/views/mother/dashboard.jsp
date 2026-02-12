@@ -84,6 +84,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="<%= request.getContextPath() %>/search-by-date">
+                            <i class="fas fa-search"></i> Search by Date
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <span class="nav-link"><i class="fas fa-user"></i> <%= mother.getFullName() %></span>
                     </li>
                     <li class="nav-item">

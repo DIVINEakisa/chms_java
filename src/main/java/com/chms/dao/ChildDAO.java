@@ -174,6 +174,83 @@ public class ChildDAO {
     }
 
     /**
+     * Delete a child record (hard delete)
+     */
+    public boolean deleteChild(int childId) {
+        String sql = "DELETE FROM children WHERE child_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, childId);
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                logger.info("Child deleted successfully: {}", childId);
+                return true;
+            }
+        } catch (SQLException e) {
+            logger.error("Error deleting child: {}", childId, e);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Search children by date of birth
+     */
+    public List<Child> searchChildrenByDateOfBirth(java.sql.Date dateOfBirth) {
+        List<Child> children = new ArrayList<>();
+        String sql = "SELECT * FROM children WHERE date_of_birth = ? ORDER BY full_name";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, dateOfBirth);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                children.add(mapResultSetToChild(rs));
+            }
+            
+            logger.info("Found {} children with date of birth: {}", children.size(), dateOfBirth);
+            
+        } catch (SQLException e) {
+            logger.error("Error searching children by date of birth: " + dateOfBirth, e);
+        }
+        
+        return children;
+    }
+
+    /**
+     * Search children by date of birth range
+     */
+    public List<Child> searchChildrenByDateRange(java.sql.Date startDate, java.sql.Date endDate) {
+        List<Child> children = new ArrayList<>();
+        String sql = "SELECT * FROM children WHERE date_of_birth BETWEEN ? AND ? ORDER BY date_of_birth DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, startDate);
+            pstmt.setDate(2, endDate);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                children.add(mapResultSetToChild(rs));
+            }
+            
+            logger.info("Found {} children between {} and {}", children.size(), startDate, endDate);
+            
+        } catch (SQLException e) {
+            logger.error("Error searching children by date range", e);
+        }
+        
+        return children;
+    }
+
+    /**
      * Map ResultSet to Child object
      */
     private Child mapResultSetToChild(ResultSet rs) throws SQLException {

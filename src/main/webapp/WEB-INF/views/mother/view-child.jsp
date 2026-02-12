@@ -108,14 +108,46 @@
                     <a href="<%= request.getContextPath() %>/mother/dashboard" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Dashboard
                     </a>
-                    <a href="<%= request.getContextPath() %>/mother/edit-child?id=<%= child.getChildId() %>" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit Information
-                    </a>
+                    <div>
+                        <a href="<%= request.getContextPath() %>/mother/edit-child?id=<%= child.getChildId() %>" class="btn btn-primary me-2">
+                            <i class="fas fa-edit"></i> Edit Information
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete(<%= child.getChildId() %>, '<%= child.getFullName() %>')">
+                            <i class="fas fa-trash"></i> Delete Child
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(childId, childName) {
+            if (confirm('Are you sure you want to delete ' + childName + '? This action cannot be undone!')) {
+                // Send delete request
+                fetch('<%= request.getContextPath() %>/delete-child', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'childId=' + childId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Child deleted successfully!');
+                        window.location.href = '<%= request.getContextPath() %>/mother/dashboard';
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to delete child'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the child');
+                });
+            }
+        }
+    </script>
 </body>
 </html>
