@@ -272,21 +272,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function deleteUser(userId, userName) {
-            if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
+            if (confirm('Are you sure you want to permanently delete user "' + userName + '"? All related data will be removed.')) {
                 fetch('<%= request.getContextPath() %>/admin/delete-user?userId=' + userId, {
                     method: 'POST'
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('User deleted successfully');
+                        alert('✓ User deleted successfully!');
                         location.reload();
                     } else {
-                        alert('Error: ' + (data.message || 'Failed to delete user'));
+                        alert('✗ Deletion failed: ' + (data.message || 'Unable to delete user'));
                     }
                 })
                 .catch(error => {
-                    alert('Error deleting user: ' + error);
+                    alert('✗ Error: Unable to delete user. Please try again.');
                 });
             }
         }

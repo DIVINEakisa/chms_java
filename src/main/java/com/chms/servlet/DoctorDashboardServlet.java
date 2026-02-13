@@ -55,11 +55,11 @@ public class DoctorDashboardServlet extends HttpServlet {
             // Get all children under this doctor's care
             List<Child> patients = childDAO.getChildrenByDoctorId(doctorId);
             
-            // Set attributes for JSP
+            // Set attributes for JSP (ensure non-null lists)
             request.setAttribute("doctor", loggedInUser);
-            request.setAttribute("upcomingAppointments", upcomingAppointments);
-            request.setAttribute("todayAppointments", todayAppointments);
-            request.setAttribute("patients", patients);
+            request.setAttribute("upcomingAppointments", upcomingAppointments != null ? upcomingAppointments : new java.util.ArrayList<>());
+            request.setAttribute("todayAppointments", todayAppointments != null ? todayAppointments : new java.util.ArrayList<>());
+            request.setAttribute("patients", patients != null ? patients : new java.util.ArrayList<>());
             
             logger.info("Doctor dashboard loaded for: {} (ID: {})", loggedInUser.getEmail(), doctorId);
             
@@ -67,8 +67,14 @@ public class DoctorDashboardServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/doctor/dashboard.jsp").forward(request, response);
             
         } catch (Exception e) {
-            logger.error("Error loading doctor dashboard", e);
-            response.sendRedirect(request.getContextPath() + "/index.jsp?error=system");
+            logger.error("Error loading doctor dashboard for user ID: " + loggedInUser.getUserId(), e);
+            // Set empty lists to prevent NPE in JSP
+            request.setAttribute("doctor", loggedInUser);
+            request.setAttribute("upcomingAppointments", new java.util.ArrayList<>());
+            request.setAttribute("todayAppointments", new java.util.ArrayList<>());
+            request.setAttribute("patients", new java.util.ArrayList<>());
+            request.setAttribute("errorMessage", "Unable to load some dashboard data. Please refresh the page.");
+            request.getRequestDispatcher("/WEB-INF/views/doctor/dashboard.jsp").forward(request, response);
         }
     }
 }

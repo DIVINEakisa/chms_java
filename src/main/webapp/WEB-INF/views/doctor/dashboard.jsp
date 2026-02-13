@@ -2,12 +2,22 @@
 <%@ page import="com.chms.model.Child, com.chms.model.User, com.chms.model.Appointment, java.util.List, java.text.SimpleDateFormat" %>
 <%
     User doctor = (User) request.getAttribute("doctor");
+    if (doctor == null) {
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
+    }
+    
     @SuppressWarnings("unchecked")
     List<Appointment> todayAppointments = (List<Appointment>) request.getAttribute("todayAppointments");
     @SuppressWarnings("unchecked")
     List<Appointment> upcomingAppointments = (List<Appointment>) request.getAttribute("upcomingAppointments");
     @SuppressWarnings("unchecked")
     List<Child> patients = (List<Child>) request.getAttribute("patients");
+    
+    // Initialize lists if null
+    if (todayAppointments == null) todayAppointments = new java.util.ArrayList<>();
+    if (upcomingAppointments == null) upcomingAppointments = new java.util.ArrayList<>();
+    if (patients == null) patients = new java.util.ArrayList<>();
     
     SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM dd, yyyy");
     SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm a");
@@ -81,6 +91,13 @@
             <div class="col-12 mb-4">
                 <h2 class="text-white"><i class="fas fa-tachometer-alt"></i> Doctor Dashboard</h2>
                 <p class="text-white">Welcome back, Dr. <%= doctor.getFullName() %>!</p>
+                <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+                <% if (errorMessage != null) { %>
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> <%= errorMessage %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
             </div>
         </div>
 
@@ -88,19 +105,19 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="stat-card text-center">
-                    <h3><%= todayAppointments != null ? todayAppointments.size() : 0 %></h3>
+                    <h3><%= todayAppointments.size() %></h3>
                     <p><i class="fas fa-calendar-day"></i> Today's Appointments</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-card text-center">
-                    <h3><%= upcomingAppointments != null ? upcomingAppointments.size() : 0 %></h3>
+                    <h3><%= upcomingAppointments.size() %></h3>
                     <p><i class="fas fa-calendar-alt"></i> Upcoming Appointments</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stat-card text-center">
-                    <h3><%= patients != null ? patients.size() : 0 %></h3>
+                    <h3><%= patients.size() %></h3>
                     <p><i class="fas fa-users"></i> Total Patients</p>
                 </div>
             </div>
@@ -182,11 +199,11 @@
                                             <div class="card-body">
                                                 <h6 class="card-title"><i class="fas fa-child text-info"></i> <%= child.getFullName() %></h6>
                                                 <p class="card-text">
-                                                    <small class="text-muted">Profile ID: <%= child.getProfileId() %></small><br>
+                                                    <small class="text-muted">Profile ID: <%= child.getUniqueProfileId() %></small><br>
                                                     <small>DOB: <%= child.getDateOfBirth() != null ? dateFormatter.format(child.getDateOfBirth()) : "N/A" %></small><br>
                                                     <small>Gender: <%= child.getGender() %></small>
-                                                    <% if (child.getBloodType() != null && !child.getBloodType().isEmpty()) { %>
-                                                        <br><small>Blood: <%= child.getBloodType() %></small>
+                                                    <% if (child.getBloodGroup() != null && !child.getBloodGroup().isEmpty()) { %>
+                                                        <br><small>Blood: <%= child.getBloodGroup() %></small>
                                                     <% } %>
                                                 </p>
                                                 <button class="btn btn-sm btn-outline-info w-100">
