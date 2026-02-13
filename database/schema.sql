@@ -54,7 +54,7 @@ CREATE TABLE children (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (mother_id) REFERENCES users(user_id) ON DELETE RESTRICT,
+    FOREIGN KEY (mother_id) REFERENCES users(user_id) ON DELETE CASCADE,
     INDEX idx_mother_id (mother_id),
     INDEX idx_dob (date_of_birth),
     INDEX idx_active (is_active)
@@ -67,7 +67,7 @@ CREATE TABLE children (
 CREATE TABLE health_records (
     record_id INT PRIMARY KEY AUTO_INCREMENT,
     child_id INT NOT NULL,
-    doctor_id INT NOT NULL,
+    doctor_id INT NULL COMMENT 'Doctor who performed assessment - NULL if doctor deleted',
     assessment_date DATE NOT NULL,
     child_age_months INT NOT NULL COMMENT 'Age in months at assessment',
     weight DECIMAL(5,2) NOT NULL COMMENT 'Weight in kg',
@@ -85,7 +85,7 @@ CREATE TABLE health_records (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (child_id) REFERENCES children(child_id) ON DELETE CASCADE,
-    FOREIGN KEY (doctor_id) REFERENCES users(user_id) ON DELETE RESTRICT,
+    FOREIGN KEY (doctor_id) REFERENCES users(user_id) ON DELETE SET NULL,
     INDEX idx_child_id (child_id),
     INDEX idx_doctor_id (doctor_id),
     INDEX idx_assessment_date (assessment_date),
