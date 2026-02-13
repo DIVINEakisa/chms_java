@@ -230,8 +230,8 @@
             <a href="<%= request.getContextPath() %>/<%= loggedInUser.getRole().name().toLowerCase() %>/dashboard">← Back to Dashboard</a>
         </div>
         
-        <h1>🔍 Search Records by Date</h1>
-        <p class="subtitle">Search appointments, children, or users by date</p>
+        <h1>🔍 Advanced Search</h1>
+        <p class="subtitle">Search appointments, children, or users by date, time, and name</p>
         
         <% if (error != null) { %>
             <div class="alert alert-error">
@@ -285,14 +285,83 @@
                     </div>
                 </div>
                 
-                <button type="submit">Search</button>
+                <!-- Additional Filters -->
+                <div style="border-top: 2px solid #ddd; margin: 25px 0; padding-top: 20px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📋 Additional Filters (Optional)</h3>
+                    
+                    <div class="form-group">
+                        <label for="name">Filter by Name:</label>
+                        <input type="text" name="name" id="name" placeholder="Enter name to filter (child, mother, doctor, or user name)"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                               value="<%= request.getAttribute("nameFilter") != null ? request.getAttribute("nameFilter") : "" %>">
+                        <small style="color: #666;">Enter any part of the name to filter results</small>
+                    </div>
+                    
+                    <div class="form-group" id="timeFilterGroup" style="<%= !"appointments".equals(searchType) ? "display:none;" : "" %>">
+                        <label>Filter by Time Range (for appointments only):</label>
+                        <div class="date-inputs">
+                            <div>
+                                <label for="startTime">From Time:</label>
+                                <input type="time" name="startTime" id="startTime"
+                                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                       value="<%= request.getAttribute("startTime") != null ? request.getAttribute("startTime") : "" %>">
+                            </div>
+                            <div>
+                                <label for="endTime">To Time:</label>
+                                <input type="time" name="endTime" id="endTime"
+                                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                                       value="<%= request.getAttribute("endTime") != null ? request.getAttribute("endTime") : "" %>">
+                            </div>
+                        </div>
+                        <small style="color: #666;">Leave empty to show all appointments regardless of time</small>
+                    </div>
+                </div>
+                
+                <button type="submit">🔍 Search with Filters</button>
             </form>
         </div>
+        
+        <script>
+            // Show/hide time filter based on search type
+            document.getElementById('type').addEventListener('change', function() {
+                var timeFilterGroup = document.getElementById('timeFilterGroup');
+                if (this.value === 'appointments') {
+                    timeFilterGroup.style.display = 'block';
+                } else {
+                    timeFilterGroup.style.display = 'none';
+                }
+            });
+        </script>
         
         <% if (resultCount != null) { %>
             <div class="results-header">
                 <h2>Search Results</h2>
                 <span class="result-count"><%= resultCount %> record(s) found</span>
+            </div>
+            
+            <!-- Show active filters -->
+            <div style="background: #f0f8ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #667eea;">
+                <strong>Active Filters:</strong> 
+                <% if (request.getAttribute("searchDate") != null && !request.getAttribute("searchDate").toString().isEmpty()) { %>
+                    <span style="background: #667eea; color: white; padding: 4px 10px; border-radius: 15px; margin: 0 5px; font-size: 13px;">
+                        📅 Date: <%= request.getAttribute("searchDate") %>
+                    </span>
+                <% } %>
+                <% if (request.getAttribute("startDate") != null && !request.getAttribute("startDate").toString().isEmpty()) { %>
+                    <span style="background: #667eea; color: white; padding: 4px 10px; border-radius: 15px; margin: 0 5px; font-size: 13px;">
+                        📅 <%= request.getAttribute("startDate") %> to <%= request.getAttribute("endDate") %>
+                    </span>
+                <% } %>
+                <% if (request.getAttribute("nameFilter") != null && !request.getAttribute("nameFilter").toString().isEmpty()) { %>
+                    <span style="background: #28a745; color: white; padding: 4px 10px; border-radius: 15px; margin: 0 5px; font-size: 13px;">
+                        👤 Name: <%= request.getAttribute("nameFilter") %>
+                    </span>
+                <% } %>
+                <% if (request.getAttribute("startTime") != null && !request.getAttribute("startTime").toString().isEmpty()) { %>
+                    <span style="background: #ffc107; color: #333; padding: 4px 10px; border-radius: 15px; margin: 0 5px; font-size: 13px;">
+                        🕐 Time: <%= request.getAttribute("startTime") %> - <%= request.getAttribute("endTime") %>
+                    </span>
+                <% } %>
             </div>
             
             <% if ("appointments".equals(searchType) && appointments != null) { %>
